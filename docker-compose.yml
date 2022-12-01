@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  jwt-test:
+    build: ./
+    container_name: jwt-test
+    ports:
+      - "8081:8081"
+    depends_on:
+      - jwt-db
+    environment:
+      - DB_HOST=jwt-db
+      - DB_PORT=5432
+
+  jwt-db:
+    image: postgres:14-alpine
+    container_name: jwt-db
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=jwt_test
+      - POSTGRES_USER=owner
+      - POSTGRES_PASSWORD=password

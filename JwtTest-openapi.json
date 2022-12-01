@@ -1,0 +1,257 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "JwtTest Swagger Api",
+    "contact": {
+      "name": "Красногорский Михаил",
+      "url": "https://github.com/MihailKrasnogorskiy",
+      "email": "mikser256@gmail.com"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Контроллер сообщений",
+      "description": "Контроллер предназначенный для работы с сообщениями. Для работы с эндпоинтами требуется авторизация по токену."
+    },
+    {
+      "name": "Контроллер авторизации пользователей",
+      "description": "Контроллер предназначенный для авторизации пользователей и получения токена."
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "tags": [
+          "Контроллер авторизации пользователей"
+        ],
+        "summary": "Авторизация пользователя",
+        "description": "Позволяет авторизовать пользователя",
+        "operationId": "authorization",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ошибка авторизации",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запрашиваемый объект не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/messages": {
+      "post": {
+        "tags": [
+          "Контроллер сообщений"
+        ],
+        "summary": "Работа с сообщениями пользователя",
+        "description": "Позволяет сохранить сообщение или получить историю сообщении пользователя",
+        "operationId": "create",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Токен полученный при авторизации перед токеном необходимо добавить \"Bearer_\"",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Ошибка авторизации",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Запрашиваемый объект не найден",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "description": "stacktrace",
+            "items": {
+              "type": "string",
+              "description": "stacktrace"
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "сообщение об ошибке",
+            "example": "Пользователь не найден"
+          },
+          "reason": {
+            "type": "string",
+            "description": "причина",
+            "example": "Иван"
+          },
+          "status": {
+            "type": "string",
+            "description": "http статус",
+            "example": "NOT_FOUND"
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "время"
+          }
+        },
+        "description": "Сообщение об ошибке"
+      },
+      "UserDto": {
+        "required": [
+          "name",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Иван"
+          },
+          "password": {
+            "type": "string",
+            "description": "Пароль пользователя",
+            "example": "password"
+          }
+        },
+        "description": "сущность пользователя"
+      },
+      "TokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "токен",
+            "example": "eyJhbGciOiJub25lIn0.eyJzdWIiOiJ0ZXN0In0."
+          }
+        },
+        "description": "Сущность токена"
+      },
+      "NewMessage": {
+        "required": [
+          "message",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Автор"
+          },
+          "message": {
+            "type": "string",
+            "description": "Текст сообщения, если текст сообщения \"history 10\", то в ответ будет возвращены 10 последних сообщений пользователя",
+            "example": "текст сообщения"
+          }
+        },
+        "description": "сущность нового сообщения"
+      },
+      "MessageDto": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Текст сообщения",
+            "example": "текст сообщения"
+          },
+          "created": {
+            "type": "string",
+            "description": "Дата создания сообщения",
+            "example": "2022-11-30 12:05:33"
+          },
+          "author": {
+            "type": "string",
+            "description": "Автр сообщения",
+            "example": "Автор"
+          }
+        },
+        "description": "Сущность сообщения"
+      }
+    }
+  }
+}
